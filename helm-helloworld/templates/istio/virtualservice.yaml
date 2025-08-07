@@ -21,12 +21,9 @@ spec:
     route:
     - destination:
         host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
-        port:
-          number: {{ .Values.service.port }}
+        subset: stable
       weight: {{ .Values.traffic.canaryWeight }}
    - destination:
         host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
-        port:
-          number: {{ .Values.service.port }}
         subset: canary
       weight: 0
