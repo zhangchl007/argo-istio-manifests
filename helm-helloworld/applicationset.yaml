@@ -11,9 +11,11 @@ spec:
         - cluster: cluster2
           url: https://dev-aphid-ag7ava9s.hcp.brazilsouth.azmk8s.io:443
           environment: dev
+          namespace: helloworld
         - cluster: cluster1
           url: https://prod-weevil-jf8xyfdc.hcp.brazilsouth.azmk8s.io:443
           environment: prod
+          namespace: helloworld
 
   template:
     metadata:
@@ -30,7 +32,7 @@ spec:
             - env/{{cluster}}/version.yaml
       destination:
         server: '{{url}}'
-        namespace: {{ .Values.namespace | default "default" }}
+        namespace: "{{namespace}}"
       syncPolicy:
         automated:
           prune: true
