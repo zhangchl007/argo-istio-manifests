@@ -6,5 +6,4 @@ metadata:
   labels:
     name: {{ .Values.namespace | default .Release.Namespace }}
     istio-injection: enabled
-    azure.devops/environment: {{ .Values.global.environment | default "unknown" }}
 {{- end }}
