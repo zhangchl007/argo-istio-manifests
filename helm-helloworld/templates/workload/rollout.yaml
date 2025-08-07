@@ -2,18 +2,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: helloworld
-  namespace: {{ .Values.namespace | default "default" }}
+  name: {{ include "helloworld.fullname" . }}
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
+labels:
+    {{- include "helloworld.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: helloworld
+      {{- include "helloworld.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
+        {{- include "helloworld.labels" . | nindent 8 }}
+        # Istio service mesh labels for multi-cluster routing
+        version: {{ .Values.environment }}
         app: helloworld
-        version: stable
     spec:
       containers:
       - name: helloworld
