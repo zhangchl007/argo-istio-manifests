@@ -23,7 +23,7 @@ spec:
     spec:
       project: default
       source:
-        repoURL: https://github.com/zhangchl007/helloworld.git
+        repoURL: https://github.com/zhangchl007/argo-istio-manifests.git
         targetRevision: HEAD
         path: helm-helloworld
         helm:
