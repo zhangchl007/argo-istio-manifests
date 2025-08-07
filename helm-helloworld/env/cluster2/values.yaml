@@ -3,6 +3,7 @@
 # Declare variables to be passed into your templates.
 environment: dev
 namespace: helloworld
+createNamespace: true
 replicaCount: 0
 image:
   repository: docker.io/istio/examples-helloworld-v1
