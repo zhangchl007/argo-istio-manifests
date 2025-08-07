@@ -17,7 +17,7 @@ spec:
 
   template:
     metadata:
-      name: "{{cluster.name}}-helloworld"
+      name: "{{cluster}}-helloworld"
     spec:
       project: default
       source:
@@ -26,10 +26,10 @@ spec:
         path: helloworld-chart
         helm:
           valueFiles:
-            - env/{{cluster.name}}/values.yaml
-            - env/{{cluster.name}}/version.yaml
+            - env/{{cluster}}/values.yaml
+            - env/{{cluster}}/version.yaml
       destination:
-        server: "{{cluster.server}}"
+        server: '{{url}}'
         namespace: {{ .Values.namespace | default "default" }}
       syncPolicy:
         automated:
