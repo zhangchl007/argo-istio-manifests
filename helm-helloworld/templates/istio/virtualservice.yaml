@@ -20,12 +20,13 @@ spec:
     name: helloworld
     route:
     - destination:
-         host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default "default" }}.svc.cluster.local
+        host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
         port:
-          number: 5000
+          number: {{ .Values.service.port }}
       weight: {{ .Values.traffic.canaryWeight }}
-    - destination:
-        host: {{ include "helloworld.fullname" . }}-canary.{{ .Values.namespace | default "default" }}.svc.cluster.local
+   - destination:
+        host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
         port:
-          number: 5000
+          number: {{ .Values.service.port }}
+        subset: canary
       weight: 0
