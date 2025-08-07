@@ -30,7 +30,7 @@ spec:
             - env/{{cluster.name}}/version.yaml
       destination:
         server: "{{cluster.server}}"
-        namespace: default
+        namespace: {{ .Values.namespace | default "default" }}
       syncPolicy:
         automated:
           prune: true

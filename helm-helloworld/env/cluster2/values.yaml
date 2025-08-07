@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 environment: dev
-namespace: default
+namespace: helloworld
 replicaCount: 0
 image:
   repository: docker.io/istio/examples-helloworld-v1
