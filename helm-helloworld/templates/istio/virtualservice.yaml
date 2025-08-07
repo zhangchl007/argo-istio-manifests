@@ -1,24 +1,22 @@
 apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
-  name: helloworld-vs
+  name: {{ include "helloworld.fullname" . }}
   namespace: {{ .Values.namespace | default "default" }}
   labels:
     {{- include "helloworld.labels" . | nindent 4 }}
 spec:
   hosts:
-   {{- range .Values.istio.hosts }}
-  - {{ . | quote }}
-  {{- end }}
+  - "helloworld.cloudapp008.com"
   gateways:
   - {{ include "helloworld.fullname" . }}-gateway
   http:
   - route:
     - destination:
-        host: helloworld.{{ .Values.namespace | default "default" }}.svc.cluster.local
+        host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default "default" }}.svc.cluster.local
         subset: stable
       weight: {{ .Values.traffic.stableWeight }}
     - destination:
-        host: helloworld.{{ .Values.namespace | default "default" }}.svc.cluster.local
+        host: {{ include "helloworld.fullname" . }}-canary.{{ .Values.namespace | default "default" }}.svc.cluster.local
         subset: canary
       weight: {{ .Values.traffic.canaryWeight }}
