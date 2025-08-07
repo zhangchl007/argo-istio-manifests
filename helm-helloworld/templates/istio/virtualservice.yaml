@@ -3,9 +3,15 @@ kind: VirtualService
 metadata:
   name: helloworld-vs
   namespace: {{ .Values.namespace | default "default" }}
+  labels:
+    {{- include "helloworld.labels" . | nindent 4 }}
 spec:
   hosts:
-  - helloworld.{{ .Values.namespace | default "default" }}.svc.cluster.local
+   {{- range .Values.istio.hosts }}
+  - {{ . | quote }}
+  {{- end }}
+  gateways:
+  - {{ include "helloworld.fullname" . }}-gateway
   http:
   - route:
     - destination:
