@@ -23,7 +23,7 @@ spec:
       source:
         repoURL: https://github.com/zhangchl007/helloworld.git
         targetRevision: HEAD
-        path: helloworld-chart
+        path: helm-helloworld
         helm:
           valueFiles:
             - env/{{cluster}}/values.yaml
