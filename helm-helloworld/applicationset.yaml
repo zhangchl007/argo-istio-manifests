@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: helloworld
+  namespace: argocd
+spec:
+  spec:
+  generators:
+    - list:
+        elements:
+        - cluster: cluster2
+          url: https://dev-aphid-ag7ava9s.hcp.brazilsouth.azmk8s.io:443
+          environment: dev
+        - cluster: cluster1
+          url: https://prod-weevil-jf8xyfdc.hcp.brazilsouth.azmk8s.io:443
+          environment: prod
+
+  template:
+    metadata:
+      name: "{{cluster.name}}-helloworld"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/zhangchl007/helloworld.git
+        targetRevision: HEAD
+        path: helloworld-chart
+        helm:
+          valueFiles:
+            - env/{{cluster.name}}/values.yaml
+            - env/{{cluster.name}}/version.yaml
+      destination:
+        server: "{{cluster.server}}"
+        namespace: default
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

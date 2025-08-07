@@ -1,0 +1,23 @@
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: helloworld-dr
+  namespace: {{ .Values.namespace | default "default" }}
+spec:
+  host: helloworld.{{ .Values.namespace | default "default" }}.svc.cluster.local
+  subsets:
+  - name: stable
+    labels:
+      app: helloworld
+      version: stable
+  - name: canary
+    labels:
+      app: helloworld
+      version: canary
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+    {{- if eq .Values.environment "prod" }}
+    localityLbSetting:
+      enabled: true
+    {{- end }}
