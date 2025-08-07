@@ -19,7 +19,7 @@ spec:
 
   template:
     metadata:
-      name: "{{cluster}}-helloworld"
+      name: "helloworld"
     spec:
       project: default
       source:

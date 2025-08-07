@@ -6,17 +6,26 @@ metadata:
   labels:
     {{- include "helloworld.labels" . | nindent 4 }}
 spec:
-  hosts:
-  - "helloworld.cloudapp008.com"
   gateways:
-  - {{ include "helloworld.fullname" . }}-gateway
+  - istio-system/ingressgateway
+  hosts:
+  - '*'
   http:
-  - route:
+  - match:
+    - sourceLabels:
+        app: istio-ingressgateway
+        istio: ingressgateway
+      uri:
+        prefix: /hello
+    name: helloworld
+    route:
     - destination:
-        host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default "default" }}.svc.cluster.local
-        subset: stable
-      weight: {{ .Values.traffic.stableWeight }}
+         host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default "default" }}.svc.cluster.local
+        port:
+          number: 5000
+      weight: {{ .Values.traffic.canaryWeight }}
     - destination:
         host: {{ include "helloworld.fullname" . }}-canary.{{ .Values.namespace | default "default" }}.svc.cluster.local
-        subset: canary
-      weight: {{ .Values.traffic.canaryWeight }}
+        port:
+          number: 5000
+      weight: 0
