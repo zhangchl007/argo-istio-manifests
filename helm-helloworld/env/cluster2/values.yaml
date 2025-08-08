@@ -10,8 +10,8 @@ image:
   pullPolicy: IfNotPresent
   tag: "1.0"
 traffic:
-  stableWeight: 100
-  canaryWeight: 0
+  stableWeight: 50
+  canaryWeight: 50
 
 imagePullSecrets: []
 nameOverride: ""
