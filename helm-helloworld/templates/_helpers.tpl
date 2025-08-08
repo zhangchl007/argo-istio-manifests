@@ -1,4 +1,62 @@
 {{/*
+Expand the name of the chart or use nameOverride
+*/}}
+{{- define "helloworld.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Chart label (name-version)
+*/}}
+{{- define "helloworld.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+fullname that returns only the extracted app name (e.g. cluster1-helloworld -> helloworld)
+Use fullnameOverride if provided.
+*/}}
+{{- define "helloworld.fullname" -}}
+{{- if .Values.fullnameOverride -}}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- include "helloworld.appName" . | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Standard labels used across resources
+*/}}
+{{- define "helloworld.labels" -}}
+helm.sh/chart: {{ include "helloworld.chart" . }}
+app.kubernetes.io/name: {{ include "helloworld.appName" . }}
+app.kubernetes.io/instance: {{ include "helloworld.appName" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Selector labels (must match pod template labels)
+*/}}
+{{- define "helloworld.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "helloworld.appName" . }}
+app.kubernetes.io/instance: {{ include "helloworld.appName" . }}
+{{- end -}}
+
+{{/*
+ServiceAccount name
+*/}}
+{{- define "helloworld.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+{{- default (include "helloworld.fullname" .) .Values.serviceAccount.name -}}
+{{- else -}}
+{{- default "default" .Values.serviceAccount.name -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Extract application name from ArgoCD application name
 Usage: {{ include "helloworld.appName" . }}
 */}}
@@ -48,12 +106,3 @@ Azure-optimized fullname that uses extracted app name
 {{- end -}}
 {{- end -}}
 {{- end -}}
-
-
-{{/*
-Azure selector labels with extracted app name
-*/}}
-{{- define "helloworld.azureSelectorLabels" -}}
-app.kubernetes.io/name: {{ include "helloworld.appName" . }}
-app.kubernetes.io/instance: {{ include "helloworld.appName" . }}
-{{- end }}
