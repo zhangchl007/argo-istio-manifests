@@ -7,15 +7,12 @@ metadata:
     {{- include "helloworld.labels" . | nindent 4 }}
 spec:
   gateways:
-  - istio-system/ingressgateway
+  - {{ include "helloworld.fullname" . }}-gateway
   hosts:
   - '*'
   http:
   - match:
-    - sourceLabels:
-        app: istio-ingressgateway
-        istio: ingressgateway
-      uri:
+    - uri:
         prefix: /hello
     name: helloworld
     route:
