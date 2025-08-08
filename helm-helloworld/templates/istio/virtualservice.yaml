@@ -19,8 +19,8 @@ spec:
     - destination:
         host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
         subset: stable
-      weight: {{ .Values.traffic.stableWeight | default 100 }}
+      weight: {{ .Values.traffic.stableWeight | default 50 }}
     - destination:
         host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
         subset: canary
-      weight: {{ .Values.traffic.canaryWeight | default 0 }}
+      weight: {{ .Values.traffic.canaryWeight | default 50 }}
