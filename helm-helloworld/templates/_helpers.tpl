@@ -1,62 +1,59 @@
 {{/*
-Expand the name of the chart.
+Extract application name from ArgoCD application name
+Usage: {{ include "helloworld.appName" . }}
 */}}
-{{- define "helloworld.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
-{{- end }}
+{{- define "helloworld.appName" -}}
+{{- if contains "-" .Release.Name -}}
+{{- $parts := splitList "-" .Release.Name -}}
+{{- if gt (len $parts) 1 -}}
+{{- last $parts -}}
+{{- else -}}
+{{- .Release.Name -}}
+{{- end -}}
+{{- else -}}
+{{- .Release.Name -}}
+{{- end -}}
+{{- end -}}
 
 {{/*
-Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
+Extract cluster name from ArgoCD application name
+Usage: {{ include "helloworld.clusterName" . }}
 */}}
-{{- define "helloworld.fullname" -}}
-{{- if .Values.fullnameOverride }}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- $name := default .Chart.Name .Values.nameOverride }}
-{{- if contains $name .Release.Name }}
-{{- .Release.Name | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
-{{- end }}
-{{- end }}
-{{- end }}
+{{- define "helloworld.clusterName" -}}
+{{- if contains "-" .Release.Name -}}
+{{- $parts := splitList "-" .Release.Name -}}
+{{- if gt (len $parts) 1 -}}
+{{- first $parts -}}
+{{- else -}}
+{{- "unknown" -}}
+{{- end -}}
+{{- else -}}
+{{- "unknown" -}}
+{{- end -}}
+{{- end -}}
 
 {{/*
-Create chart name and version as used by the chart label.
+Azure-optimized fullname that uses extracted app name
 */}}
-{{- define "helloworld.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-{{- end }}
+{{- define "helloworld.azureFullname" -}}
+{{- $appName := include "helloworld.appName" . -}}
+{{- if .Values.fullnameOverride -}}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name $appName -}}
+{{- $appName | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" $appName $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
 
 {{/*
-Common labels
+Azure selector labels with extracted app name
 */}}
-{{- define "helloworld.labels" -}}
-helm.sh/chart: {{ include "helloworld.chart" . }}
-{{ include "helloworld.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end }}
-
-{{/*
-Selector labels
-*/}}
-{{- define "helloworld.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "helloworld.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "helloworld.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "helloworld.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
+{{- define "helloworld.azureSelectorLabels" -}}
+app.kubernetes.io/name: {{ include "helloworld.appName" . }}
+app.kubernetes.io/instance: {{ include "helloworld.appName" . }}
 {{- end }}
