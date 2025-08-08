@@ -1,8 +1,8 @@
-apiVersion: networking.istio.io/v1
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: {{ include "helloworld.fullname" . }}
-  namespace: {{ .Values.namespace | default "default" }}
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
     {{- include "helloworld.labels" . | nindent 4 }}
 spec:
@@ -22,8 +22,8 @@ spec:
     - destination:
         host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
         subset: stable
-      weight: {{ .Values.traffic.canaryWeight }}
+      weight: {{ .Values.traffic.stableWeight | default 100 }}
     - destination:
         host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
         subset: canary
-      weight: 0
+      weight: {{ .Values.traffic.canaryWeight | default 0 }}
