@@ -28,8 +28,8 @@ spec:
         path: helm-helloworld
         helm:
           valueFiles:
-            - env/{{cluster}}/values.yaml
-            - env/{{cluster}}/version.yaml
+            - env/dev/{{cluster}}/values.yaml
+            - env/dev/{{cluster}}/version.yaml
       destination:
         server: '{{url}}'
         namespace: "{{namespace}}"
