@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "helloworld.fullname" . }}              # stable service
+  name: {{ include "helloworld.fullname" . }}
   namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
     {{- include "helloworld.labels" . | nindent 4 }}
@@ -9,32 +9,9 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   type: {{ .Values.service.type }}
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
   selector:
-    {{- include "helloworld.selectorLabels" . | nindent 4 }}  # 移除 version 以满足 Rollout 校验
-
-{{- if and (eq .Values.environment "prod") .Values.rollout.enabled }}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ include "helloworld.fullname" . }}-canary        # canary service
-  namespace: {{ .Values.namespace | default .Release.Namespace }}
-  labels:
-    {{- include "helloworld.labels" . | nindent 4 }}
-    role: canary
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
-spec:
-  type: ClusterIP
-  selector:
-    {{- include "helloworld.selectorLabels" . | nindent 4 }}  # 同样移除 version
+    {{- include "helloworld.selectorLabels" . | nindent 4 }}
   ports:
   - name: http
     port: {{ .Values.service.port }}
     targetPort: http
-{{- end }}

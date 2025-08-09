@@ -12,11 +12,12 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "helloworld.selectorLabels" . | nindent 6 }}   # 移除 version
+      {{- include "helloworld.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "helloworld.selectorLabels" . | nindent 8 }} # 不再固定 version
+        {{- include "helloworld.selectorLabels" . | nindent 8 }}
+        rollout.refresh: "{{ now | unixEpoch }}"  # remove after first clean rollout
     spec:
       serviceAccountName: {{ include "helloworld.serviceAccountName" . }}
       containers:
@@ -27,8 +28,6 @@ spec:
           containerPort: {{ .Values.service.port }}
   strategy:
     canary:
-      stableService: {{ include "helloworld.fullname" . }}
-      canaryService: {{ include "helloworld.fullname" . }}-canary
       trafficRouting:
         istio:
           virtualService:
