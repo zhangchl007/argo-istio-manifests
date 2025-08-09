@@ -28,6 +28,9 @@ spec:
           valueFiles:
             - env/dev/{{cluster}}/values.yaml
             - env/dev/{{cluster}}/version.yaml
+          parameters:
+            - name: fullnameOverride
+              value: helloworld
       destination:
         server: '{{url}}'
         namespace: "{{namespace}}"
