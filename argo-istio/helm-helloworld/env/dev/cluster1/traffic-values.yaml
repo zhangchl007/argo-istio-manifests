@@ -1,4 +1,0 @@
-namespace: helloworld
-traffic:
-  stableWeight: 100
-  canaryWeight: 0
