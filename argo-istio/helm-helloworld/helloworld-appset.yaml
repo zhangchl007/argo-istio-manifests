@@ -26,8 +26,8 @@ spec:
         path: argo-istio/helm-helloworld
         helm:
           valueFiles:
-            - env/{{environment}}/{{cluster}}/values.yaml
-            - env/{{environment}}/{{cluster}}/version.yaml
+            - env/dev/{{cluster}}/values.yaml
+            - env/dev/{{cluster}}/version.yaml
       destination:
         server: '{{url}}'
         namespace: "{{namespace}}"

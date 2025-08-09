@@ -23,10 +23,10 @@ spec:
       source:
         repoURL: https://github.com/zhangchl007/argo-istio-manifests.git
         targetRevision: HEAD
-        path: argo-istio/helm-traffic/chart
+        path: argo-istio/helm-traffic
         helm:
           valueFiles:
-            - env/{{environment}}/{{cluster}}/traffic-values.yaml
+            - env/dev/{{cluster}}/traffic-values.yaml
       destination:
         server: '{{url}}'
         namespace: "{{namespace}}"
