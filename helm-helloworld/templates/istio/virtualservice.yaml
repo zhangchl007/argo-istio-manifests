@@ -1,10 +1,12 @@
 apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
-  name: {{ include "helloworld.fullname" . }}   # uses: [`helloworld.fullname`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
+  name: {{ include "helloworld.fullname" . }}
   namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
-    {{- include "helloworld.labels" . | nindent 4 }}  # uses: [`helloworld.labels`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
+    {{- include "helloworld.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   gateways:
   - {{ include "helloworld.fullname" . }}-gateway
@@ -19,7 +21,6 @@ spec:
     - destination:
         host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
         subset: stable
-      # 当启用 Rollout 时固定 100，未启用时使用配置权重（默认 50）
       weight: {{ if .Values.rollout.enabled }}100{{ else }}{{ default 50 .Values.traffic.stableWeight }}{{ end }}
     - destination:
         host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local

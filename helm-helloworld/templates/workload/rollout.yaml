@@ -6,15 +6,19 @@ metadata:
   namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
     {{- include "helloworld.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "helloworld.selectorLabels" . | nindent 6 }}
+      version: stable
   template:
     metadata:
       labels:
         {{- include "helloworld.selectorLabels" . | nindent 8 }}
+        version: stable
     spec:
       serviceAccountName: {{ include "helloworld.serviceAccountName" . }}
       containers:
@@ -25,8 +29,8 @@ spec:
           containerPort: {{ .Values.service.port }}
   strategy:
     canary:
-      stableService: {{ include "helloworld.fullname" . }}          # 稳定 Service (已有)
-      canaryService: {{ include "helloworld.fullname" . }}-canary   # 新建的 canary Service
+      stableService: {{ include "helloworld.fullname" . }}
+      canaryService: {{ include "helloworld.fullname" . }}-canary
       trafficRouting:
         istio:
           virtualService:
