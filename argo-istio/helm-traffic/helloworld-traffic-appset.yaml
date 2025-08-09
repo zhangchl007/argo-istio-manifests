@@ -17,7 +17,7 @@ spec:
         namespace: helloworld
   template:
     metadata:
-      name: "{{cluster}}-helloworld"
+      name: "{{cluster}}-helloworld-traffic"
     spec:
       project: default
       source:
