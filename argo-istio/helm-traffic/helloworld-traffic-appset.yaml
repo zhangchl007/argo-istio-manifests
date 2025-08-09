@@ -23,7 +23,7 @@ spec:
       source:
         repoURL: https://github.com/zhangchl007/argo-istio-manifests.git
         targetRevision: HEAD
-        path: helm-helloworld-traffic
+        path: argo-istio/helm-traffic/chart
         helm:
           valueFiles:
             - env/{{environment}}/{{cluster}}/traffic-values.yaml

@@ -23,7 +23,7 @@ spec:
       source:
         repoURL: https://github.com/zhangchl007/argo-istio-manifests.git
         targetRevision: HEAD
-        path: helm-helloworld
+        path: argo-istio/helm-helloworld
         helm:
           valueFiles:
             - env/{{environment}}/{{cluster}}/values.yaml
