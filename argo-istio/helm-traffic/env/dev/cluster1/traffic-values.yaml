@@ -2,3 +2,6 @@ namespace: helloworld
 traffic:
   stableWeight: 100
   canaryWeight: 0
+service:
+  type: ClusterIP
+  port: 5000
