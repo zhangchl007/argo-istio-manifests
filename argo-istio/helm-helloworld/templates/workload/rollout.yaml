@@ -17,7 +17,6 @@ spec:
     metadata:
       labels:
         {{- include "helloworld.selectorLabels" . | nindent 8 }}
-        # REMOVED rollout.refresh timestamp to prevent forced RS on every sync
     spec:
       serviceAccountName: {{ include "helloworld.serviceAccountName" . }}
       containers:
@@ -28,22 +27,14 @@ spec:
           containerPort: {{ .Values.service.port }}
   strategy:
     canary:
+      stableService: {{ include "helloworld.fullname" . }}
+      canaryService: {{ include "helloworld.fullname" . }}-canary
       trafficRouting:
         istio:
           virtualService:
             name: {{ include "helloworld.fullname" . }}
             routes:
             - helloworld
-          destinationRule:
-            name: {{ include "helloworld.fullname" . }}
-            stableSubsetName: stable
-            canarySubsetName: canary
-      stableMetadata:
-        labels:
-          version: stable
-      canaryMetadata:
-        labels:
-          version: canary
       steps:
       - setWeight: 20
       - pause: { duration: 30s }

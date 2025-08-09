@@ -1,28 +1,38 @@
-apiVersion: networking.istio.io/v1
-kind: VirtualService
+# Stable service
+apiVersion: v1
+kind: Service
 metadata:
   name: {{ include "helloworld.fullname" . }}
   namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
     {{- include "helloworld.labels" . | nindent 4 }}
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "0"
 spec:
-  gateways:
-  - {{ include "helloworld.fullname" . }}-gateway
-  hosts:
-  - '*'
-  http:
-  - name: helloworld
-    match:
-    - uri:
-        prefix: /hello
-    route:
-    - destination:
-        host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
-        subset: stable
-      weight: {{ default 100 .Values.traffic.stableWeight }}
-    - destination:
-        host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
-        subset: canary
-      weight: {{ default 0 .Values.traffic.canaryWeight }}
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "helloworld.selectorLabels" . | nindent 4 }}
+  ports:
+  - name: http
+    port: {{ .Values.service.port }}
+    targetPort: http
+---
+# Canary service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "helloworld.fullname" . }}-canary
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "helloworld.labels" . | nindent 4 }}
+    role: canary
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "helloworld.selectorLabels" . | nindent 4 }}
+  ports:
+  - name: http
+    port: {{ .Values.service.port }}
+    targetPort: http
