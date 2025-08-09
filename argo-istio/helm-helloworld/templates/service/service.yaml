@@ -1,3 +1,4 @@
+# Stable service
 apiVersion: v1
 kind: Service
 metadata:
@@ -9,6 +10,26 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   type: {{ .Values.service.type }}
+  selector:
+    {{- include "helloworld.selectorLabels" . | nindent 4 }}
+  ports:
+  - name: http
+    port: {{ .Values.service.port }}
+    targetPort: http
+---
+# Canary service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "helloworld.fullname" . }}-canary
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "helloworld.labels" . | nindent 4 }}
+    role: canary
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  type: ClusterIP
   selector:
     {{- include "helloworld.selectorLabels" . | nindent 4 }}
   ports:
