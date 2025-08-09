@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "helloworld.fullname" . }}
+  name: {{ include "helloworld.fullname" . }}              # stable service
   namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
     {{- include "helloworld.labels" . | nindent 4 }}
@@ -15,17 +15,14 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "helloworld.selectorLabels" . | nindent 4 }}
-    {{- if and (eq .Values.environment "prod") .Values.rollout.enabled }}
-    version: stable
-    {{- end }}
+    {{- include "helloworld.selectorLabels" . | nindent 4 }}  # 移除 version 以满足 Rollout 校验
 
 {{- if and (eq .Values.environment "prod") .Values.rollout.enabled }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "helloworld.fullname" . }}-canary
+  name: {{ include "helloworld.fullname" . }}-canary        # canary service
   namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
     {{- include "helloworld.labels" . | nindent 4 }}
@@ -35,8 +32,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    {{- include "helloworld.selectorLabels" . | nindent 4 }}
-    version: canary
+    {{- include "helloworld.selectorLabels" . | nindent 4 }}  # 同样移除 version
   ports:
   - name: http
     port: {{ .Values.service.port }}
