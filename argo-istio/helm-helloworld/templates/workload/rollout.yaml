@@ -37,25 +37,11 @@ spec:
             - helloworld
       steps:
       - setWeight: 20
-      {{- if and .Values.rollout.analysis .Values.rollout.analysis.enabled }}
-      - analysis:
-          templates:
-          - templateName: {{ include "helloworld.fullname" . }}-canary-metrics
-      {{- end }}
-      - pause: { duration: 30s }
-      - setWeight: 50
-      {{- if and .Values.rollout.analysis .Values.rollout.analysis.enabled }}
-      - analysis:
-          templates:
-          - templateName: {{ include "helloworld.fullname" . }}-canary-metrics
-      {{- end }}
-      - pause: { duration: 60s }
-      {{- if and .Values.rollout.analysis .Values.rollout.analysis.enabled }}
-      prePromotionAnalysis:
-        templates:
-        - templateName: {{ include "helloworld.fullname" . }}-canary-metrics
-      postPromotionAnalysis:
-        templates:
-        - templateName: {{ include "helloworld.fullname" . }}-canary-metrics
-      {{- end }}
+      - pause: {duration: 20s}
+      - setWeight: 40
+      - pause: {duration: 20s}
+      - setWeight: 60
+      - pause: {duration: 20s}
+      - setWeight: 80
+      - pause: {duration: 20s}
 {{- end }}
