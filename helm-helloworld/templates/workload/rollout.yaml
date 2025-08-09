@@ -2,36 +2,41 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: {{ include "helloworld.fullname" . }}   # uses: [`helloworld.fullname`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
+  name: {{ include "helloworld.fullname" . }}
   namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
-    {{- include "helloworld.labels" . | nindent 4 }}  # uses: [`helloworld.labels`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
+    {{- include "helloworld.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "helloworld.selectorLabels" . | nindent 6 }}  # uses: [`helloworld.selectorLabels`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
+      {{- include "helloworld.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         {{- include "helloworld.selectorLabels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "helloworld.serviceAccountName" . }}  # uses: [`helloworld.serviceAccountName`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
+      serviceAccountName: {{ include "helloworld.serviceAccountName" . }}
       containers:
-      - name: {{ include "helloworld.appName" . }}  # uses: [`helloworld.appName`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
+      - name: {{ include "helloworld.appName" . }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         ports:
         - name: http
           containerPort: {{ .Values.service.port }}
   strategy:
     canary:
-      # 让 Rollouts 驱动 Istio VirtualService 路由（路由名见 VS 中 name: helloworld）
+      stableService: {{ include "helloworld.fullname" . }}          # 稳定 Service (已有)
+      canaryService: {{ include "helloworld.fullname" . }}-canary   # 新建的 canary Service
       trafficRouting:
         istio:
           virtualService:
             name: {{ include "helloworld.fullname" . }}
             routes:
             - helloworld
+          destinationRule:
+            name: {{ include "helloworld.fullname" . }}
+            stableSubsetName: stable
+            canarySubsetName: canary
       stableMetadata:
         labels:
           version: stable
