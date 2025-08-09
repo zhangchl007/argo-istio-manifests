@@ -11,6 +11,17 @@ image:
   tag: "1.0"
 rollout:
   enabled: true
+  analysis:
+    enabled: true
+    prometheus:
+      address: http://prometheus.monitoring.svc.cluster.local:9090
+      interval: 60          # seconds between measurements
+      count: 3              # measurements per metric
+      successRateThreshold: 0.95
+      errorRateThreshold: 0.05
+      latencyP95Threshold: 300   # ms
+    failureLimit: 1
+    inconclusiveLimit: 1
 
 imagePullSecrets: []
 nameOverride: ""

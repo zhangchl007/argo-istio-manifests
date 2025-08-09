@@ -1,0 +1,69 @@
+{{- if and (eq .Values.environment "prod") .Values.rollout.enabled (and .Values.rollout.analysis .Values.rollout.analysis.enabled) }}
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ include "helloworld.fullname" . }}-canary-metrics
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "helloworld.labels" . | nindent 4 }}
+spec:
+  args:
+  - name: canaryService
+    value: {{ include "helloworld.fullname" . }}-canary
+  - name: stableService
+    value: {{ include "helloworld.fullname" . }}
+  metrics:
+  - name: success-rate
+    interval: {{ .Values.rollout.analysis.prometheus.interval }}s
+    count: {{ .Values.rollout.analysis.prometheus.count }}
+    successCondition: result >= {{ .Values.rollout.analysis.prometheus.successRateThreshold }}
+    failureLimit: {{ .Values.rollout.analysis.failureLimit }}
+    inconclusiveLimit: {{ .Values.rollout.analysis.inconclusiveLimit }}
+    provider:
+      prometheus:
+        address: {{ .Values.rollout.analysis.prometheus.address }}
+        query: |
+          sum(rate(istio_requests_total{
+                reporter="destination",
+                destination_service=~"{{`{{args.canaryService}}`}}\\..*",
+                response_code!~"5.."
+              }[{{ .Values.rollout.analysis.prometheus.interval }}s]))
+          /
+          sum(rate(istio_requests_total{
+                reporter="destination",
+                destination_service=~"{{`{{args.canaryService}}`}}\\..*"
+              }[{{ .Values.rollout.analysis.prometheus.interval }}s]))
+  - name: error-rate
+    interval: {{ .Values.rollout.analysis.prometheus.interval }}s
+    count: {{ .Values.rollout.analysis.prometheus.count }}
+    successCondition: result <= {{ .Values.rollout.analysis.prometheus.errorRateThreshold }}
+    failureLimit: {{ .Values.rollout.analysis.failureLimit }}
+    provider:
+      prometheus:
+        address: {{ .Values.rollout.analysis.prometheus.address }}
+        query: |
+          sum(rate(istio_requests_total{
+                reporter="destination",
+                destination_service=~"{{`{{args.canaryService}}`}}\\..*",
+                response_code=~"5.."
+              }[{{ .Values.rollout.analysis.prometheus.interval }}s]))
+          /
+          sum(rate(istio_requests_total{
+                reporter="destination",
+                destination_service=~"{{`{{args.canaryService}}`}}\\..*"
+              }[{{ .Values.rollout.analysis.prometheus.interval }}s]))
+  - name: latency-p95
+    interval: {{ .Values.rollout.analysis.prometheus.interval }}s
+    count: {{ .Values.rollout.analysis.prometheus.count }}
+    successCondition: result <= {{ .Values.rollout.analysis.prometheus.latencyP95Threshold }}
+    failureLimit: {{ .Values.rollout.analysis.failureLimit }}
+    provider:
+      prometheus:
+        address: {{ .Values.rollout.analysis.prometheus.address }}
+        query: |
+          histogram_quantile(0.95,
+            sum(rate(istio_request_duration_milliseconds_bucket{
+                  reporter="destination",
+                  destination_service=~"{{`{{args.canaryService}}`}}\\..*"
+                }[{{ .Values.rollout.analysis.prometheus.interval }}s])) by (le))
+{{- end }}
