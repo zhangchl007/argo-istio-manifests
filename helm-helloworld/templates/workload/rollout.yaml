@@ -1,0 +1,46 @@
+{{- if and (eq .Values.environment "prod") .Values.rollout.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ include "helloworld.fullname" . }}   # uses: [`helloworld.fullname`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "helloworld.labels" . | nindent 4 }}  # uses: [`helloworld.labels`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "helloworld.selectorLabels" . | nindent 6 }}  # uses: [`helloworld.selectorLabels`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
+  template:
+    metadata:
+      labels:
+        {{- include "helloworld.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "helloworld.serviceAccountName" . }}  # uses: [`helloworld.serviceAccountName`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
+      containers:
+      - name: {{ include "helloworld.appName" . }}  # uses: [`helloworld.appName`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.port }}
+  strategy:
+    canary:
+      # 让 Rollouts 驱动 Istio VirtualService 路由（路由名见 VS 中 name: helloworld）
+      trafficRouting:
+        istio:
+          virtualService:
+            name: {{ include "helloworld.fullname" . }}
+            routes:
+            - helloworld
+      stableMetadata:
+        labels:
+          version: stable
+      canaryMetadata:
+        labels:
+          version: canary
+      steps:
+      - setWeight: 20
+      - pause: { duration: 30s }
+      - setWeight: 50
+      - pause: { duration: 60s }
+{{- end }}

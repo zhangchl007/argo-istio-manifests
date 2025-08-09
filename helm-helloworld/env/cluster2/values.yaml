@@ -4,6 +4,8 @@
 environment: dev
 namespace: helloworld
 createNamespace: true
+rollout:
+  enabled: false
 replicaCount: 0
 image:
   repository: docker.io/istio/examples-helloworld-v1

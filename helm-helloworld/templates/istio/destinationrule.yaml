@@ -2,20 +2,18 @@ apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
   name: {{ include "helloworld.fullname" . }}
-  namespace: {{ .Values.namespace | default "default" }}
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
 spec:
-  host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default "default" }}.svc.cluster.local
+  host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
   subsets:
   - name: stable
     labels:
-      {{- include "helloworld.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/name: {{ include "helloworld.appName" . }}  # uses: [`helloworld.appName`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
+      version: stable
   - name: canary
     labels:
-      {{- include "helloworld.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/name: {{ include "helloworld.appName" . }}
+      version: canary
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
-    {{- if eq .Values.environment "prod" }}
-    localityLbSetting:
-      enabled: true
-    {{- end }}

@@ -1,26 +1,26 @@
-apiVersion: networking.istio.io/v1beta1
+apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
-  name: {{ include "helloworld.fullname" . }}
+  name: {{ include "helloworld.fullname" . }}   # uses: [`helloworld.fullname`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
   namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
-    {{- include "helloworld.labels" . | nindent 4 }}
+    {{- include "helloworld.labels" . | nindent 4 }}  # uses: [`helloworld.labels`](argo-istio-manifests/helm-helloworld/templates/_helpers.tpl)
 spec:
   gateways:
   - {{ include "helloworld.fullname" . }}-gateway
   hosts:
   - '*'
   http:
-  - match:
+  - name: helloworld
+    match:
     - uri:
         prefix: /hello
-    name: helloworld
     route:
     - destination:
         host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
         subset: stable
-      weight: {{ .Values.traffic.stableWeight | default 50 }}
+      weight: {{- if .Values.rollout.enabled -}}100{{- else -}}{{ default 50 .Values.traffic.stableWeight }}{{- end }}
     - destination:
         host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
         subset: canary
-      weight: {{ .Values.traffic.canaryWeight | default 50 }}
+      weight: {{- if .Values.rollout.enabled -}}0{{- else -}}{{ default 50 .Values.traffic.canaryWeight }}{{- end }}

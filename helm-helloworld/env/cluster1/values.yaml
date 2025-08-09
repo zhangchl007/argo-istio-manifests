@@ -9,9 +9,11 @@ image:
   repository: docker.io/istio/examples-helloworld-v1
   pullPolicy: IfNotPresent
   tag: "1.0"
+rollout:
+  enabled: true
 traffic:
-  stableWeight: 50
-  canaryWeight: 50
+  stableWeight: 100
+  canaryWeight: 0
 
 imagePullSecrets: []
 nameOverride: ""
