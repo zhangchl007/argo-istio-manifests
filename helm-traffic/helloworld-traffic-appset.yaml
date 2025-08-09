@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: helloworld-traffic
+  namespace: argocd
+spec:
+  generators:
+  - list:
+      elements:
+      - cluster: cluster2
+        url: https://dev-aphid-ag7ava9s.hcp.brazilsouth.azmk8s.io:443
+        environment: dev
+        namespace: helloworld
+      - cluster: cluster1
+        url: https://prod-weevil-jf8xyfdc.hcp.brazilsouth.azmk8s.io:443
+        environment: prod
+        namespace: helloworld
+  template:
+    metadata:
+      name: "{{cluster}}-helloworld-traffic"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/zhangchl007/argo-istio-manifests.git
+        targetRevision: HEAD
+        path: helm-helloworld-traffic
+        helm:
+          valueFiles:
+            - env/{{environment}}/{{cluster}}/traffic-values.yaml
+      destination:
+        server: '{{url}}'
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true

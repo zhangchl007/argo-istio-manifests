@@ -11,9 +11,6 @@ image:
   tag: "1.0"
 rollout:
   enabled: true
-traffic:
-  stableWeight: 100
-  canaryWeight: 0
 
 imagePullSecrets: []
 nameOverride: ""

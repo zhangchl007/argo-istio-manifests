@@ -7,7 +7,7 @@ metadata:
   labels:
     {{- include "helloworld.labels" . | nindent 4 }}
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -17,7 +17,7 @@ spec:
     metadata:
       labels:
         {{- include "helloworld.selectorLabels" . | nindent 8 }}
-        rollout.refresh: "{{ now | unixEpoch }}"  # remove after first clean rollout
+        # REMOVED rollout.refresh timestamp to prevent forced RS on every sync
     spec:
       serviceAccountName: {{ include "helloworld.serviceAccountName" . }}
       containers:
