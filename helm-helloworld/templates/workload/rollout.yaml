@@ -12,13 +12,11 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "helloworld.selectorLabels" . | nindent 6 }}
-      version: stable
+      {{- include "helloworld.selectorLabels" . | nindent 6 }}   # 移除 version
   template:
     metadata:
       labels:
-        {{- include "helloworld.selectorLabels" . | nindent 8 }}
-        version: stable
+        {{- include "helloworld.selectorLabels" . | nindent 8 }} # 不再固定 version
     spec:
       serviceAccountName: {{ include "helloworld.serviceAccountName" . }}
       containers:
