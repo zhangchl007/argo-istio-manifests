@@ -1,0 +1,3 @@
+image:
+  repository: docker.io/istio/examples-helloworld-v1
+  tag: "1.0"
