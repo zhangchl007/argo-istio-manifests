@@ -7,13 +7,13 @@ spec:
   generators:
   - list:
       elements:
-      - cluster: cluster2
+      - cluster: remote
         url: https://dev-aphid-ag7ava9s.hcp.brazilsouth.azmk8s.io:443
         environment: dev
         namespace: helloworld
-      - cluster: cluster1
+      - cluster: primary
         url: https://prod-weevil-jf8xyfdc.hcp.brazilsouth.azmk8s.io:443
-        environment: prod
+        environment: dev
         namespace: helloworld
   template:
     metadata:
@@ -26,7 +26,7 @@ spec:
         path: argo-istio/helm-traffic
         helm:
           valueFiles:
-            - env/dev/{{cluster}}/traffic-values.yaml
+            - values/env/{{environment}}/{{cluster}}/traffic-values.yaml
           parameters:
             - name: fullnameOverride
               value: helloworld

@@ -1,4 +1,4 @@
-{{- if and (eq .Values.environment "prod") .Values.rollout.enabled }}
+{{- if and (eq .Values.cluster "primary") .Values.rollout.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
