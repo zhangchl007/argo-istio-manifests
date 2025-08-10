@@ -20,17 +20,20 @@ spec:
       name: "{{cluster}}-helloworld-app"
     spec:
       project: default
-      source:
-        repoURL: https://github.com/zhangchl007/argo-istio-manifests.git
-        targetRevision: HEAD
-        path: argo-istio/helm-helloworld
-        helm:
-          valueFiles:
-            - ../values/env/{{environment}}/{{cluster}}/values.yaml
-            - ../values/env/{{environment}}/common/version.yaml
-          parameters:
-            - name: fullnameOverride
-              value: helloworld
+      sources:
+        - repoURL: https://github.com/zhangchl007/argo-istio-manifests.git
+          targetRevision: HEAD
+          path: argo-istio/helm-helloworld
+          helm:
+            valueFiles:
+              - ../values/env/{{environment}}/{{cluster}}/values.yaml
+              - ../values/env/{{environment}}/common/version.yaml
+            parameters:
+              - name: fullnameOverride
+                value: helloworld
+        - repoURL: https://github.com/zhangchl007/argo-istio-manifests.git
+          targetRevision: HEAD
+          ref: values
       destination:
         server: '{{url}}'
         namespace: "{{namespace}}"
