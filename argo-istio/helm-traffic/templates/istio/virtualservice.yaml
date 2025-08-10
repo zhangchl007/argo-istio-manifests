@@ -21,10 +21,10 @@ spec:
     - destination:
         host: {{ include "helloworld.fullname" . }}.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
         port:
-          number: {{ .Values.service.port | default 8080 }}
+          number: {{ .Values.service.port | default 5000 }}
       weight: 100
     - destination:
         host: {{ include "helloworld.fullname" . }}-canary.{{ .Values.namespace | default .Release.Namespace }}.svc.cluster.local
         port:
-          number: {{ .Values.service.port | default 8080 }}
+          number: {{ .Values.service.port | default 5000 }}
       weight: 0
