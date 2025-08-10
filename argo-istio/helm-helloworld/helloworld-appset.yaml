@@ -26,8 +26,8 @@ spec:
         path: argo-istio/helm-helloworld
         helm:
           valueFiles:
-            - values/env/{{environment}}/{{cluster}}/values.yaml
-            - values/env/{{environment}}/common/version.yaml
+            - ../values/env/{{environment}}/{{cluster}}/values.yaml
+            - ../values/env/{{environment}}/common/version.yaml
           parameters:
             - name: fullnameOverride
               value: helloworld
